@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>HashGame</title>
+    <link rel="stylesheet" href="//cdn.jsdelivr.net/npm/alertifyjs@1.13.1/build/css/alertify.min.css"/>
+    <link rel="stylesheet" href="//cdn.jsdelivr.net/npm/alertifyjs@1.13.1/build/css/themes/default.min.css"/>
+
+    <style>
+        html {
+            scroll-behavior: smooth;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, sans-serif;
+            background: #121212; /* fallback for old browsers */
+            overflow-x: hidden;
+
+            height: 100%;
+
+            /* code to make all text unselectable */
+            -webkit-user-select: none;
+            -khtml-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            -o-user-select: none;
+            user-select: none;
+        }
+
+        /* Disables selector ring */
+        body:not(.user-is-tabbing) button:focus,
+        body:not(.user-is-tabbing) input:focus,
+        body:not(.user-is-tabbing) select:focus,
+        body:not(.user-is-tabbing) textarea:focus {
+            outline: none;
+        }
+
+        /* ########################################################## */
+
+        h1 {
+            color: white;
+
+            font-size: 35px;
+            font-weight: 800;
+        }
+
+        .flex-container {
+            width: 100vw;
+
+            margin-top: 60px;
+
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .content-container {
+            min-width: 450px;
+            max-width: 500px;
+            height: 350px;
+        }
+
+        .form-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+
+            min-width: 450px;
+            max-width: 500px;
+
+            height: 350px;
+
+            margin-top: 5px;
+            padding-top: 20px;
+
+            border-radius: 12px;
+            flex-direction: column;
+
+            background: #1f1f1f;
+            box-shadow: 5px 5px 10px rgba(0, 0, 0, 0.199);
+        }
+
+        input {
+            border: none;
+            border-bottom: solid rgb(143, 143, 143) 1px;
+
+            margin-bottom: 30px;
+
+            background: none;
+            color: rgba(255, 255, 255, 0.555);
+
+            height: 50px;
+            width: 350px;
+        }
+
+        .submit-btn {
+            cursor: pointer;
+            border: none;
+            border-radius: 10px;
+            background: #7bbe48;
+            color: rgba(255, 255, 255, 0.8);
+            transition: all 1s;
+            font-size: 20px;
+        }
+
+        .msg {
+            padding: 20px;
+            background-color: #7bbe48;
+            color: white;
+            margin-bottom: 15px;
+            border-radius: 10px;
+            display: none;
+        }
+
+        .alertify-notifier .ajs-message.ajs-success {
+            background: #7bbe48;
+        }
+
+        .alertify-notifier .ajs-message.ajs-error {
+            background: #f64d34;
+        }
+    </style>
+</head>
+<body>
+<div class="flex-container">
+    <div class="content-container">
+        <div class="form-container">
+            <form id="hash_form">
+                <h1>
+                    Hash Game
+                </h1>
+                <br/>
+                <label>
+                    <input type="text" name="hash" placeholder="Your Hash">
+                </label>
+                <br/>
+                <div id="msg" class="msg">
+                    <span class="closebtn"></span>
+                </div>
+                <br/>
+                <div style="text-align: center;">
+                    <input type="submit" value="submit" class="submit-btn">
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+</body>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.min.js"
+        integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo=" crossorigin="anonymous"></script>
+<script src="//cdn.jsdelivr.net/npm/alertifyjs@1.13.1/build/alertify.min.js"></script>
+
+<script>
+    function getFormData($form) {
+        var unindexed_array = $form.serializeArray();
+        var indexed_array = {};
+
+        $.map(unindexed_array, function (n, i) {
+            indexed_array[n['name']] = n['value'];
+        });
+        var data = JSON.stringify(indexed_array);
+        return data
+    }
+
+    $(document).ready(function () {
+        alertify.set('notifier', 'position', 'top-right');
+        $("#hash_form").submit(function (e) {
+            var msg = $("#msg");
+            msg.hide();
+            e.preventDefault();
+            $.ajax({
+                url: '/',
+                type: "POST",
+                dataType: 'json',
+                contentType: "application/json",
+                data: getFormData($("#hash_form")),
+                success: function (result) {
+                    if (result["msg"] === "ok") {
+                        msg.html("<span class=\"closebtn\"></span>Your letter is: " + result["letter"]);
+                        msg.show();
+                        alertify.success('Letter retrieved');
+                    }
+                },
+                error: function (xhr, resp, text) {
+                    if (resp === "error") {
+                        console.log("Hash invalid");
+                        alertify.error('Invalid Hash');
+                    }
+                }
+            })
+        });
+    });
+</script>
+</html>
