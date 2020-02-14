@@ -125,4 +125,4 @@ venv.bak/
 dmypy.json
 
 utils.py
-data.json
+*.json
