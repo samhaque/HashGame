@@ -18,7 +18,7 @@ def homepage():
 def process():
     user_inp = request.get_json()
     if user_inp and "hash" in user_inp.keys():
-        letter = hash_to_letter(user_inp["hash"])
+        letter = hash_to_letter(str(user_inp["hash"]).strip().upper())
         if letter:
             return jsonify({"msg": "ok", "letter": letter})
     return jsonify({"msg": "failed"})
